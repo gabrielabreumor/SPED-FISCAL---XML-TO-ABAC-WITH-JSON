@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Testar Acesso</title>
+    <style>
+        body {
+            background-color: #0d1b2a; /* Azul escuro */
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        form {
+            background-color: #1b263b;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 300px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            text-align: left;
+        }
+
+        input[type="file"],
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border: none;
+            outline: none;
+        }
+
+        button {
+            background-color: #6a0dad; /* Roxo */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #7a1fd1;
+        }
+
+        hr {
+            width: 80%;
+            border: 1px solid #3a4a6b;
+        }
+    </style>
+</head>
+<body>
+    <h1>Conversão e Verificação de Acesso</h1>
+    
+    <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+        <label for="file">Escolha o arquivo XML:</label>
+        <input type="file" name="file" id="file" required>
+        <button type="submit">Converter XML para JSON</button>
+    </form>
+
+    <hr>
+
+    <form id="verificarForm" action="/verificar_acesso" method="post">
+        <label for="cargo">Cargo:</label>
+        <input type="text" name="cargo" id="cargo" value="gerente" required>
+        
+        <label for="localizacao">Localização:</label>
+        <input type="text" name="localizacao" id="localizacao" value="BR" required>
+        
+        <label for="perm_leitura">Permissão de Leitura:</label>
+        <select name="perm_leitura" id="perm_leitura" required>
+            <option value="true" selected>Sim</option>
+            <option value="false">Não</option>
+        </select>
+        
+        <input type="hidden" name="json_data" id="json_data" value='{"eFinanceira": {"loteEventos": {"evento": {"eFinanceira": {"evtMovOpFin": {"ideDeclarado": {"paisResid": {"Pais": "BR"}}}}}}}'>
+        
+        <button type="submit">Verificar Acesso</button>
+    </form>    
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var formData = new FormData(this);
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            }).then(response => response.json())
+              .then(data => {
+                  if (data.json) {
+                      document.getElementById('json_data').value = data.json;
+                      alert('XML convertido com sucesso! Agora você pode verificar o acesso.');
+                  } else {
+                      alert('Erro na conversão do XML.');
+                  }
+              }).catch(error => {
+                  alert('Erro: ' + error);
+              });
+        });
+    </script>
+</body>
+</html>
